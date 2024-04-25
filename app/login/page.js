@@ -112,7 +112,7 @@ const SignIn = () => {
                   textColor: "buttontext.main",
                 }}
                 color="primary"
-                disabled={isValid}
+                disabled={isDirty}
               >
                 Sign In
               </Button>
