@@ -111,9 +111,8 @@ const SignIn = () => {
                   bgcolor: "primary.main",
                   textColor: "buttontext.main",
                 }}
-                tyle={{ cursor: "not-allowed" }}
                 color="primary"
-                disabled={(isValid, isDirty)}
+                disabled={isValid}
               >
                 Sign In
               </Button>
