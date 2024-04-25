@@ -126,7 +126,7 @@ export default function SignIn() {
                 sx={{
                   mt: 2,
                   mb: 2,
-                  bgcolor: "primary.other",
+                  bgcolor: "primary.main",
                   textColor: "buttontext.main",
                 }}
                 tyle={{ cursor: "not-allowed" }}

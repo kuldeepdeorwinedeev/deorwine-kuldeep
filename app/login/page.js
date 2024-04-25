@@ -108,7 +108,7 @@ const SignIn = () => {
                 sx={{
                   mt: 1,
                   mb: 2,
-                  bgcolor: "primary.other",
+                  bgcolor: "primary.main",
                   textColor: "buttontext.main",
                 }}
                 tyle={{ cursor: "not-allowed" }}
