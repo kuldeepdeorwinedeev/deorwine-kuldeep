@@ -129,9 +129,8 @@ export default function SignIn() {
                   bgcolor: "primary.main",
                   textColor: "buttontext.main",
                 }}
-                tyle={{ cursor: "not-allowed" }}
                 color="primary"
-                disabled={isDirty}
+                disabled={(isDirty, !isValid)}
               >
                 Sign Up
               </Button>
