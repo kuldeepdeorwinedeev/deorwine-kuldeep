@@ -8,6 +8,8 @@ import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { ThemeProvider } from "@mui/material/styles";
@@ -16,8 +18,14 @@ import { useForm } from "react-hook-form";
 import { defaultTheme } from "../components/themes";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { signUpUser } from "../api/user";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
-export default function SignIn() {
+export default function SignUp() {
+  const router = useRouter();
+  const [alert, setAlert] = React.useState({ success: false, error: false });
+  const [message, setMessage] = React.useState("");
   const schema = yup
     .object({
       email: yup.string().required().email(),
@@ -46,9 +54,41 @@ export default function SignIn() {
   console.log(errors);
   const password = React.useRef({});
   password.current = watch("password", "");
-
-  const onSubmit = (data) => {
-    console.log("Form data:", data);
+  const { mutate, isLoading } = useMutation({
+    mutationFn: signUpUser,
+    onSuccess: (data) => {
+      console.log(data);
+      if (data.status === true) {
+        setAlert({ success: true, error: false });
+        setMessage(data.message);
+        setTimeout(() => {
+          data.data.role == "admin" ? router.push("/admin") : router.push("/");
+        }, 2000);
+      } else {
+        setAlert({ success: false, error: true });
+        setMessage(data.message);
+      }
+    },
+    onError: (error) => {
+      // Error actions
+    },
+  });
+  const onSubmit = async (data) => {
+    const user = {
+      email: data.email,
+      password: data.password,
+      username: data.username,
+      role: "user",
+    };
+    mutate(user);
+  };
+  const renderAlerts = () => {
+    if (alert.success) {
+      return <Alert severity="success">{message}</Alert>;
+    } else if (alert.error) {
+      return <Alert severity="error">{message}</Alert>;
+    }
+    return null;
   };
 
   return (
@@ -69,6 +109,7 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
+          {renderAlerts()}
           <Box
             component="form"
             onSubmit={handleSubmit(onSubmit)}
@@ -119,21 +160,25 @@ export default function SignIn() {
                   : { cursor: "pointer" }
               }
             >
-              <Button
-                type="submit"
-                fullWidth
-                variant="body3"
-                sx={{
-                  mt: 2,
-                  mb: 2,
-                  bgcolor: "primary.main",
-                  textColor: "buttontext.main",
-                }}
-                color="primary"
-                disabled={(isDirty, !isValid)}
-              >
-                Sign Up
-              </Button>
+              {isLoading ? (
+                <CircularProgress color="inherit" size={25} />
+              ) : (
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="body3"
+                  sx={{
+                    mt: 2,
+                    mb: 2,
+                    bgcolor: "primary.main",
+                    textColor: "buttontext.main",
+                  }}
+                  color="primary"
+                  disabled={!isValid || !isDirty || isLoading}
+                >
+                  Sign Up
+                </Button>
+              )}
             </span>
             <Grid container>
               <Grid item>

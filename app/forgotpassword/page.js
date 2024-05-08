@@ -14,17 +14,18 @@ import { useForm } from "react-hook-form";
 import { defaultTheme } from "../components/themes";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { userForgotPassword } from "../api/user";
+import { Alert } from "@mui/material";
 
 export default function SignIn() {
+  const router = useRouter();
+  const [alert, setAlert] = React.useState({ success: false, error: false });
+  const [message, setMessage] = React.useState("");
   const schema = yup
     .object({
-      password: yup
-        .string()
-        .required("No password provided.")
-        .min(8, "Password is too short - should be 8 chars minimum."),
-      confirmpassword: yup
-        .string()
-        .oneOf([yup.ref("password"), null], "Passwords must match"),
+      email: yup.string().required().email(),
     })
     .required();
   const {
@@ -37,10 +38,39 @@ export default function SignIn() {
 
     mode: "all",
   });
-  const password = React.useRef({});
-  password.current = watch("password", "");
-  const onSubmit = (data) => {
-    console.log("Form data:", data);
+
+  const { mutate, isLoading } = useMutation({
+    mutationFn: userForgotPassword,
+    onSuccess: (data) => {
+      console.log(data);
+      if (data.status === true) {
+        setAlert({ success: true, error: false });
+        setMessage(data.message);
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      } else {
+        setAlert({ success: false, error: true });
+        setMessage(data.message);
+      }
+    },
+    onError: (error) => {
+      // Error actions
+    },
+  });
+  const onSubmit = async (data) => {
+    const user = {
+      email: data.email,
+    };
+    mutate(user);
+  };
+  const renderAlerts = () => {
+    if (alert.success) {
+      return <Alert severity="success">{message}</Alert>;
+    } else if (alert.error) {
+      return <Alert severity="error">{message}</Alert>;
+    }
+    return null;
   };
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -60,6 +90,7 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Reset Password
           </Typography>
+          {renderAlerts()}
           <Box
             component="form"
             onSubmit={handleSubmit(onSubmit)}
@@ -71,21 +102,11 @@ export default function SignIn() {
               required
               fullWidth
               autoFocus
-              label="Password"
-              type="password"
-              {...register("password")}
-              error={Boolean(errors.password)}
-              helperText={errors.password?.message}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Confirm Password"
-              type="password"
-              {...register("confirmpassword")}
-              error={Boolean(errors.confirmpassword)}
-              helperText={errors.confirmpassword?.message}
+              label="Email"
+              type="email"
+              {...register("email")}
+              error={Boolean(errors.email)}
+              helperText={errors.email?.message}
             />
             <span
               style={

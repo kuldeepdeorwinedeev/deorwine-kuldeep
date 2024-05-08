@@ -17,8 +17,15 @@ import { useForm } from "react-hook-form";
 import { defaultTheme } from "../components/themes";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { signInUser } from "../api/user";
+import { Alert } from "@mui/material";
 
 const SignIn = () => {
+  const router = useRouter();
+  const [alert, setAlert] = React.useState({ success: false, error: false });
+  const [message, setMessage] = React.useState("");
   const schema = yup
     .object({
       email: yup.string().required().email(),
@@ -34,11 +41,40 @@ const SignIn = () => {
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-
-  const onSubmit = (data) => {
-    console.log("Form data:", data);
+  const { mutate, isLoading } = useMutation({
+    mutationFn: signInUser,
+    onSuccess: (data) => {
+      console.log(data);
+      if (data.status === true) {
+        setAlert({ success: true, error: false });
+        setMessage(data.message);
+        setTimeout(() => {
+          data.data.role == "admin" ? router.push("/admin") : router.push("/");
+        }, 2000);
+      } else {
+        setAlert({ success: false, error: true });
+        setMessage(data.message);
+      }
+    },
+    onError: (error) => {
+      // Error actions
+    },
+  });
+  const onSubmit = async (data) => {
+    const user = {
+      email: data.email,
+      password: data.password,
+    };
+    mutate(user);
   };
-
+  const renderAlerts = () => {
+    if (alert.success) {
+      return <Alert severity="success">{message}</Alert>;
+    } else if (alert.error) {
+      return <Alert severity="error">{message}</Alert>;
+    }
+    return null;
+  };
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -57,6 +93,7 @@ const SignIn = () => {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
+          {renderAlerts()}
           <Box
             component="form"
             onSubmit={handleSubmit(onSubmit)}
@@ -93,7 +130,6 @@ const SignIn = () => {
                 </Link>
               </Grid>
             </Grid>
-
             <span
               style={
                 !isValid && isDirty
