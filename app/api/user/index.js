@@ -16,7 +16,7 @@ async function signUpUser(user) {
   console.log(data);
   if (response.ok) {
     const token = data.token;
-    if (token && typeof window !== undefined) {
+    if (token && typeof window !== "undefined") {
       window.localStorage.setItem("token", token);
       window.localStorage.setItem("admin", JSON.stringify(data));
     } else {
@@ -46,7 +46,7 @@ async function signInUser(user) {
   if (response.ok) {
     const token = data.data.token;
 
-    if (token && typeof window !== undefined) {
+    if (token && typeof window !== "undefined") {
       window.localStorage.setItem("token", token);
       window.localStorage.setItem("admin", JSON.stringify(data));
     } else {
