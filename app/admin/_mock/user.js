@@ -5,25 +5,27 @@ import { apiUrl } from "@/app/config";
 
 // Fetch users data from the API
 const fetchUsers = async () => {
-  const token = localStorage.getItem("token");
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    accept: "application/json",
-  };
+  if (typeof window !== undefined) {
+    const token = localStorage.getItem("token");
 
-  const options = {
-    method: "GET", // or any other HTTP method you are using
-    headers: headers,
-  };
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      accept: "application/json",
+    };
 
-  const response = await fetch(`${apiUrl}/users`, options);
-  if (!response.ok) {
-    throw new Error("Failed to fetch data");
+    const options = {
+      method: "GET", // or any other HTTP method you are using
+      headers: headers,
+    };
+
+    const response = await fetch(`${apiUrl}/users`, options);
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+    return response.json();
   }
-  return response.json();
 };
-
 // Process user data when it's loaded
 const processUserData = (userData) => {
   return userData?.map((_, index) => ({

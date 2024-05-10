@@ -27,9 +27,11 @@ export default function Nav({ openNav, onCloseNav }) {
   const router = useRouter(); // Use useRouter instead of useRouter()
 
   const upLg = useResponsive("up", "lg");
-  const data = localStorage.getItem("admin") || {};
-  const account = JSON.parse(data).data;
-  console.log(account);
+  if (typeof window !== undefined) {
+    const data = window.localStorage.getItem("admin") || {};
+    const account = JSON.parse(data).data;
+    console.log(account);
+  }
   useEffect(() => {
     if (openNav) {
       onCloseNav();

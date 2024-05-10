@@ -3,7 +3,7 @@ import { apiUrl } from "@/app/config";
 export const addUsers = async (user) => {
   console.log(user);
   try {
-    const token = localStorage.getItem("token");
+    const token = window.localStorage.getItem("token");
     const headers = {
       token: `${token}`,
       "Content-Type": "application/json",

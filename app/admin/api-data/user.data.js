@@ -13,7 +13,7 @@ export const UserProvider = ({ children }) => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = torage.getItem("token");
       const headers = {
         token: `${token}`,
         "Content-Type": "application/json",
