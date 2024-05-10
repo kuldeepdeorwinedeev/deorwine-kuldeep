@@ -1,11 +1,9 @@
-"use client";
 import PropTypes from "prop-types";
-import { memo, forwardRef } from "react";
+import { memo } from "react";
 import Box from "@mui/material/Box";
-
 import { StyledScrollbar, StyledRootScrollbar } from "./styles";
 
-const Scrollbar = forwardRef(({ children, sx, ...other }, ref) => {
+function Scrollbar({ children, sx, ...other }) {
   const userAgent =
     typeof navigator === "undefined" ? "SSR" : navigator.userAgent;
   const mobile =
@@ -15,7 +13,7 @@ const Scrollbar = forwardRef(({ children, sx, ...other }, ref) => {
 
   if (mobile) {
     return (
-      <Box ref={ref} sx={{ overflow: "auto", ...sx }} {...other}>
+      <Box sx={{ overflow: "auto", ...sx }} {...other}>
         {children}
       </Box>
     );
@@ -24,9 +22,7 @@ const Scrollbar = forwardRef(({ children, sx, ...other }, ref) => {
   return (
     <StyledRootScrollbar>
       <StyledScrollbar
-        scrollableNodeProps={{
-          ref,
-        }}
+        scrollableNodeProps={{}}
         clickOnTrack={false}
         sx={sx}
         {...other}
@@ -35,7 +31,7 @@ const Scrollbar = forwardRef(({ children, sx, ...other }, ref) => {
       </StyledScrollbar>
     </StyledRootScrollbar>
   );
-});
+}
 
 Scrollbar.propTypes = {
   children: PropTypes.node,

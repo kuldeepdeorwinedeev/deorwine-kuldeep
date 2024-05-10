@@ -29,6 +29,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.51.3",
     "react-toastify": "^10.0.5",
+    "react-window": "^1.8.10",
     "simplebar-react": "^3.2.4",
     "styled-components": "^6.1.8",
     "yup": "^1.4.0"

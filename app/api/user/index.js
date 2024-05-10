@@ -1,4 +1,5 @@
 import { apiUrl } from "@/app/config";
+
 async function signUpUser(user) {
   console.log(user);
   const options = {
@@ -12,8 +13,22 @@ async function signUpUser(user) {
 
   const response = await fetch(`${apiUrl}/user/signup`, options);
   const data = await response.json();
+  console.log(data);
+  if (response.ok) {
+    const token = data.token;
+    if (token) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("admin", JSON.stringify(data));
+    } else {
+      console.warn("Token not found in response headers");
+    }
+  } else {
+    console.error("Error:", data.message || "Failed to sign up user");
+  }
+
   return data;
 }
+
 async function signInUser(user) {
   console.log(user);
   const options = {
@@ -27,8 +42,24 @@ async function signInUser(user) {
 
   const response = await fetch(`${apiUrl}/user/signin`, options);
   const data = await response.json();
+  console.log(response);
+  if (response.ok) {
+    const token = data.data.token;
+
+    if (token) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("admin", JSON.stringify(data));
+    } else {
+      console.warn("Token not found in response headers");
+    }
+  } else {
+    console.error("Error:", data.message || "Failed to sign in user");
+  }
+
+  console.log(data);
   return data;
 }
+
 async function userForgotPassword(user) {
   console.log(user);
   const options = {

@@ -1,12 +1,17 @@
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import { fNumber } from "../../utils/format-number";
-import { Chart, useChart } from "../../components/charts"; // Update import
+import dynamic from "next/dynamic";
 
 // ----------------------------------------------------------------------
+
+const DynamicChart = dynamic(() => import("../../components/charts"), {
+  loading: () => <div>Loading Chart...</div>, // Placeholder while the Chart is loading
+  ssr: false, // Disable server-side rendering
+});
 
 export default function AppConversionRates({
   title,
@@ -15,18 +20,15 @@ export default function AppConversionRates({
   ...other
 }) {
   const { colors, series, options } = chart;
-  const [dynamicChart, setDynamicChart] = useState(null); // State to hold dynamically imported Chart component
+  const [isChartReady, setIsChartReady] = useState(false);
 
-  useEffect(() => {
-    // Dynamically import Chart component
-    import("../../components/charts").then((mod) => {
-      setDynamicChart(mod.Chart);
-    });
-  }, []);
+  const handleChartLoad = () => {
+    setIsChartReady(true);
+  };
 
   const chartSeries = series.map((i) => i.value);
 
-  const chartOptions = useChart({
+  const chartOptions = {
     colors,
     tooltip: {
       marker: { show: false },
@@ -48,22 +50,22 @@ export default function AppConversionRates({
       categories: series.map((i) => i.label),
     },
     ...options,
-  });
-
-  if (!dynamicChart) return null; // Render null if Chart component is not loaded yet
+  };
 
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
 
       <Box sx={{ mx: 3 }}>
-        <dynamicChart
+        <DynamicChart
           dir="ltr"
           type="bar"
           series={[{ data: chartSeries }]}
           options={chartOptions}
           width="100%"
           height={364}
+          onLoad={handleChartLoad}
+          style={{ display: isChartReady ? "block" : "none" }} // Hide the chart until it's loaded
         />
       </Box>
     </Card>

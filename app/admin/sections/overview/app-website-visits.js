@@ -1,15 +1,19 @@
-"use client";
 import PropTypes from "prop-types";
-
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
-import dynamic from "next/dynamic";
-import Chart, { useChart } from "../../components/charts";
-
-//
+import dynamic from "next/dynamic"; // Import dynamic from next/dynamic
 
 // ----------------------------------------------------------------------
+
+const DynamicChart = dynamic(() => import("../../components/charts/chart"), {
+  ssr: false, // Disable server-side rendering
+});
+
+const DynamicUseChart = dynamic(() => import("../../components/charts"), {
+  ssr: false, // Disable server-side rendering
+});
 
 export default function AppWebsiteVisits({
   title,
@@ -17,46 +21,59 @@ export default function AppWebsiteVisits({
   chart,
   ...other
 }) {
-  const { labels, colors, series, options } = chart;
+  const [isChartReady, setIsChartReady] = useState(false);
+  const [chartOptions, setChartOptions] = useState(null);
 
-  const chartOptions = useChart({
-    colors,
-    plotOptions: {
-      bar: {
-        columnWidth: "16%",
-      },
-    },
-    fill: {
-      type: series.map((i) => i.fill),
-    },
-    labels,
-    xaxis: {
-      type: "datetime",
-    },
-    tooltip: {
-      shared: true,
-      intersect: false,
-      y: {
-        formatter: (value) => {
-          if (typeof value !== "undefined") {
-            return `${value.toFixed(0)} visits`;
-          }
-          return value;
+  useEffect(() => {
+    const fetchData = async () => {
+      // const useChart = await DynamicUseChart();
+      const { labels, colors, series, options } = chart;
+      const option = DynamicUseChart({
+        colors,
+        plotOptions: {
+          bar: {
+            columnWidth: "16%",
+          },
         },
-      },
-    },
-    ...options,
-  });
+        fill: {
+          type: series.map((i) => i.fill),
+        },
+        labels,
+        xaxis: {
+          type: "datetime",
+        },
+        tooltip: {
+          shared: true,
+          intersect: false,
+          y: {
+            formatter: (value) => {
+              if (typeof value !== "undefined") {
+                return `${value.toFixed(0)} visits`;
+              }
+              return value;
+            },
+          },
+        },
+        ...options,
+      });
+      setChartOptions(option);
+      setIsChartReady(true);
+    };
+
+    fetchData();
+  }, []);
+
+  if (!isChartReady) return null;
 
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
 
       <Box sx={{ p: 3, pb: 1 }}>
-        <Chart
+        <DynamicChart
           dir="ltr"
           type="line"
-          series={series}
+          series={chart.series}
           options={chartOptions}
           width="100%"
           height={364}

@@ -13,6 +13,7 @@ import IconButton from "@mui/material/IconButton";
 
 import Label from "../../components/label/label";
 import Iconify from "../../components/iconify/iconify";
+import Link from "next/link";
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +26,7 @@ export default function UserTableRow({
   isVerified,
   status,
   handleClick,
+  user_id,
 }) {
   const [open, setOpen] = useState(null);
 
@@ -35,6 +37,7 @@ export default function UserTableRow({
   const handleCloseMenu = () => {
     setOpen(null);
   };
+  console.log("user key", user_id);
 
   return (
     <>
@@ -81,10 +84,12 @@ export default function UserTableRow({
           sx: { width: 140 },
         }}
       >
-        <MenuItem onClick={handleCloseMenu}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
+        <Link href={`/admin/user/${user_id}`} passHref>
+          <MenuItem onClick={handleCloseMenu}>
+            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+            Edit
+          </MenuItem>
+        </Link>
 
         <MenuItem onClick={handleCloseMenu} sx={{ color: "error.main" }}>
           <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
@@ -104,4 +109,5 @@ UserTableRow.propTypes = {
   role: PropTypes.any,
   selected: PropTypes.any,
   status: PropTypes.string,
+  user_id: PropTypes.string,
 };

@@ -115,6 +115,7 @@ function palette() {
       paper: "#FFFFFF",
       default: grey[100],
       neutral: grey[200],
+      dark: grey[1000],
     },
     action: {
       ...base.action,

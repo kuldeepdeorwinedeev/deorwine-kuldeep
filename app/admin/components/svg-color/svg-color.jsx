@@ -1,9 +1,9 @@
 "use client";
 import PropTypes from "prop-types";
-import { forwardRef } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 
-const SvgColor = forwardRef(({ src, sx, ...other }, ref) => (
+const SvgColor = React.forwardRef(({ src, sx, ...other }, ref) => (
   <Box
     component="span"
     className="svg-color"

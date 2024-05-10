@@ -1,14 +1,25 @@
-"use client";
 import PropTypes from "prop-types";
 import { styled, useTheme } from "@mui/material/styles";
 import { Card } from "@mui/material";
 import { CardHeader } from "@mui/material";
-import Chart, { useChart } from "../../components/charts";
+import dynamic from "next/dynamic"; // Import dynamic from next/dynamic
 
 const CHART_HEIGHT = 400;
 const LEGEND_HEIGHT = 72;
 
-const StyledChart = styled(Chart)(({ theme }) => ({
+// Dynamically import Chart and useChart from the components directory
+const DynamicChart = dynamic(() => import("../../components/charts/chart"), {
+  ssr: false, // Disable server-side rendering
+});
+
+const DynamicUseChart = dynamic(
+  () => import("../../components/charts/use-chart"),
+  {
+    ssr: false, // Disable server-side rendering
+  }
+);
+
+const StyledChart = styled(DynamicChart)(({ theme }) => ({
   height: CHART_HEIGHT,
   "& .apexcharts-canvas, .apexcharts-inner, svg, foreignObject": {
     height: `100% !important`,
@@ -26,6 +37,8 @@ function AppCurrentVisits({ title, subheader, chart, ...other }) {
   const theme = useTheme();
   const { colors, series, options } = chart;
   const chartSeries = series.map((i) => i.value);
+
+  const useChart = DynamicUseChart; // Extract default export from dynamic import
 
   const chartOptions = useChart({
     chart: {
@@ -90,4 +103,5 @@ AppCurrentVisits.propTypes = {
   subheader: PropTypes.string,
   title: PropTypes.string,
 };
+
 export { AppCurrentVisits };

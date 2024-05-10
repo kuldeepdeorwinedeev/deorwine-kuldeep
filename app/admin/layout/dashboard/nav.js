@@ -27,7 +27,9 @@ export default function Nav({ openNav, onCloseNav }) {
   const router = useRouter(); // Use useRouter instead of useRouter()
 
   const upLg = useResponsive("up", "lg");
-
+  const data = localStorage.getItem("admin") || {};
+  const account = JSON.parse(data).data;
+  console.log(account);
   useEffect(() => {
     if (openNav) {
       onCloseNav();
@@ -50,9 +52,9 @@ export default function Nav({ openNav, onCloseNav }) {
     >
       <Avatar src="" alt="photoURL" />
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2"></Typography>
+        <Typography variant="subtitle2">{account.username}</Typography>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {/* {account.role} */}
+          {account.role}
         </Typography>
       </Box>
     </Box>

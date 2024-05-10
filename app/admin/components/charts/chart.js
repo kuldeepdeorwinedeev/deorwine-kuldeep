@@ -1,4 +1,8 @@
-import ApexChart from "react-apexcharts";
+"use client";
+import dynamic from "next/dynamic";
+
+const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
+
 import { alpha } from "@mui/material/styles";
 import { bgBlur } from "../../theme/css";
 

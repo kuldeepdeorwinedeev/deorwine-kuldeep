@@ -3,14 +3,25 @@ import { useEffect } from "react";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import { styled, useTheme } from "@mui/material/styles";
-import Chart, { useChart } from "../../components/charts"; // Regular import instead of dynamic import
+import dynamic from "next/dynamic";
 
 // ----------------------------------------------------------------------
 
 const CHART_HEIGHT = 400;
 const LEGEND_HEIGHT = 72;
 
-const StyledChart = styled(Chart)(({ theme }) => ({
+const DynamicChart = dynamic(() => import("../../components/charts/chart"), {
+  ssr: false, // Disable server-side rendering
+});
+
+const DynamicUseChart = dynamic(
+  () => import("../../components/charts/use-chart"),
+  {
+    ssr: false, // Disable server-side rendering
+  }
+);
+
+const StyledChart = styled(DynamicChart)(({ theme }) => ({
   height: CHART_HEIGHT,
   "& .apexcharts-canvas, .apexcharts-inner, svg, foreignObject": {
     height: `100% !important`,
@@ -22,8 +33,6 @@ const StyledChart = styled(Chart)(({ theme }) => ({
   },
 }));
 
-// ----------------------------------------------------------------------
-
 export default function AppCurrentSubject({
   title,
   subheader,
@@ -34,7 +43,13 @@ export default function AppCurrentSubject({
 
   const { series, colors, categories, options } = chart;
 
-  const chartOptions = useChart({
+  const ChartOptionsComponent = DynamicUseChart;
+
+  useEffect(() => {
+    // Execute any necessary logic when the chart is loaded
+  }, []);
+
+  const chartOptions = {
     colors,
     stroke: {
       width: 2,
@@ -56,7 +71,7 @@ export default function AppCurrentSubject({
       },
     },
     ...options,
-  });
+  };
 
   return (
     <Card {...other}>

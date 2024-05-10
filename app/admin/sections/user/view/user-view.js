@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
@@ -16,7 +16,9 @@ import UserTableRow from "../user-table-row";
 import UserTableHead from "../user-table-head";
 import TableEmptyRows from "../table-empty-rows";
 import { emptyRows, applyFilter, getComparator } from "../utils.js";
-import { users } from "@/app/admin/_mock/user";
+import { useUserContext } from "@/app/admin/api-data/user.data";
+import Link from "next/link";
+import UserTableToolbar from "../user-table-toolbar";
 
 export default function UserPage() {
   const [page, setPage] = useState(0);
@@ -25,7 +27,7 @@ export default function UserPage() {
   const [orderBy, setOrderBy] = useState("name");
   const [filterName, setFilterName] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
+  const { usersData, isLoading, isError, fetchUsers } = useUserContext();
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === "asc";
     if (id !== "") {
@@ -33,21 +35,23 @@ export default function UserPage() {
       setOrderBy(id);
     }
   };
-
+  useEffect(() => {
+    fetchUsers();
+  }, []);
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
+      const newSelecteds = usersData.map((user) => user.username);
       setSelected(newSelecteds);
-      return;
+    } else {
+      setSelected([]);
     }
-    setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
+  const handleClick = (event, user_id) => {
+    const selectedIndex = selected.indexOf(user_id);
     let newSelected = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, user_id);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -76,12 +80,19 @@ export default function UserPage() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: users,
+    inputData: usersData || [],
     comparator: getComparator(order, orderBy),
     filterName,
   });
-
+  const data = dataFiltered[0].slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+  console.log(data);
   const notFound = !dataFiltered.length && !!filterName;
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error fetching data</div>;
 
   return (
     <Container>
@@ -89,26 +100,42 @@ export default function UserPage() {
         direction="row"
         alignItems="center"
         justifyContent="space-between"
-        mb={5}
+        mb={1}
       >
         <Typography variant="h4">Users</Typography>
-        <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="eva:plus-fill" />}
-          onClick={() => router.push("/new-user")} // Navigate to new user page
-        >
-          New User
-        </Button>
+        <Link href="/admin/add-user">
+          {" "}
+          <Button
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="eva:plus-fill" />}
+          >
+            New User
+          </Button>
+        </Link>
       </Stack>
       <Card>
+        <UserTableToolbar
+          numSelected={selected.length}
+          filterName={filterName}
+          onFilterName={handleFilterByName}
+        />
         <Scrollbar>
+          <TablePagination
+            page={page}
+            component="div"
+            count={usersData.length}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[5, 10, 25]}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
           <TableContainer sx={{ overflow: "unset" }}>
             <Table sx={{ minWidth: 800 }}>
               <UserTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={users.length}
+                rowCount={usersData.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
@@ -121,40 +148,33 @@ export default function UserPage() {
                   { id: "" },
                 ]}
               />
+
               <TableBody>
-                {dataFiltered
+                {dataFiltered[0]
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <UserTableRow
-                      key={row.id}
-                      name={row.name}
+                      key={row.user_id}
+                      name={row.username}
                       role={row.role}
                       status={row.status}
                       company={row.company}
                       avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
+                      isVerified={row.verified}
+                      selected={selected.indexOf(row.user_id) !== -1}
+                      handleClick={(event) => handleClick(event, row.user_id)}
+                      user_id={row.user_id}
                     />
                   ))}
                 <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
+                  height={5}
+                  emptyRows={emptyRows(page, rowsPerPage, usersData.length)}
                 />
                 {notFound && <TableNoData query={filterName} />}
               </TableBody>
             </Table>
           </TableContainer>
         </Scrollbar>
-        <TablePagination
-          page={page}
-          component="div"
-          count={users.length}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </Card>
     </Container>
   );
