@@ -25,11 +25,11 @@ import { RouterLink } from "../../routes/components";
 // Nav component
 export default function Nav({ openNav, onCloseNav }) {
   const router = useRouter(); // Use useRouter instead of useRouter()
-
+  let account;
   const upLg = useResponsive("up", "lg");
   if (typeof window !== "undefined") {
     const data = window.localStorage.getItem("admin") || {};
-    const account = JSON.parse(data).data;
+    account = JSON.parse(data).data;
     console.log(account);
   }
   useEffect(() => {
@@ -54,9 +54,11 @@ export default function Nav({ openNav, onCloseNav }) {
     >
       <Avatar src="" alt="photoURL" />
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">{account.username}</Typography>
+        <Typography variant="subtitle2">
+          {account ? account.name : ""}
+        </Typography>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {account.role}
+          {account ? account.role : ""}
         </Typography>
       </Box>
     </Box>
