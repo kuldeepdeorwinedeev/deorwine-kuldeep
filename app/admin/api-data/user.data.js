@@ -13,26 +13,28 @@ export const UserProvider = ({ children }) => {
 
   const fetchUsers = async () => {
     try {
-      const token = torage.getItem("token");
-      const headers = {
-        token: `${token}`,
-        "Content-Type": "application/json",
-        accept: "application/json",
-      };
+      if (typeof window !== "undefined") {
+        const token = window.localStorage.getItem("token");
+        const headers = {
+          token: `${token}`,
+          "Content-Type": "application/json",
+          accept: "application/json",
+        };
 
-      const options = {
-        method: "GET",
-        headers: headers,
-      };
+        const options = {
+          method: "GET",
+          headers: headers,
+        };
 
-      const response = await fetch(`${apiUrl}/admin/users`, options);
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
+        const response = await fetch(`${apiUrl}/admin/users`, options);
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        let userdata = data.data;
+        setUsersData(userdata);
+        setIsLoading(false);
       }
-      const data = await response.json();
-      let userdata = data.data;
-      setUsersData(userdata);
-      setIsLoading(false);
     } catch (error) {
       console.log(error);
       setIsError(true);
