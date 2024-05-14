@@ -468,7 +468,7 @@ const validationSchema = Yup.object().shape({
   company: Yup.string().required("Company is required"),
 });
 
-export function UserDetail({ onClick }) {
+export function UserDetail({ onClick, usersData }) {
   const [open, setOpen] = useState(false);
   const [status, setstatus] = useState("Pending");
   const handleClick = () => {
