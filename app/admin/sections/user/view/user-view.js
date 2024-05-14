@@ -103,7 +103,8 @@ export default function UserPage() {
     filterName,
   });
 
-  const data = usersData
+  // Check if dataFiltered[0] is an array before calling slice
+  const data = Array.isArray(dataFiltered[0])
     ? dataFiltered[0].slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
