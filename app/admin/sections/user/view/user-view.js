@@ -35,7 +35,7 @@ export default function UserPage() {
       setOrderBy(id);
     }
   };
-
+  console.log(usersData);
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelecteds = usersData.map((user) => user.user_id);
