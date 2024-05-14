@@ -102,12 +102,14 @@ export default function UserPage() {
     comparator: getComparator(order, orderBy),
     filterName,
   });
-  console.log(dataFiltered);
-  const data = dataFiltered[0].slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-  console.log(data);
+
+  const data = usersData
+    ? dataFiltered[0].slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      )
+    : [];
+
   const notFound = !dataFiltered.length && !!filterName;
 
   if (isLoading) return <div>Loading...</div>;
@@ -171,22 +173,20 @@ export default function UserPage() {
               />
 
               <TableBody>
-                {dataFiltered[0]
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.user_id}
-                      name={row.username}
-                      role={row.role}
-                      status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.verified}
-                      selected={selected.indexOf(row.user_id) !== -1}
-                      handleClick={(event) => handleClick(event, row.user_id)}
-                      user_id={row.user_id}
-                    />
-                  ))}
+                {data.map((row) => (
+                  <UserTableRow
+                    key={row.user_id}
+                    name={row.username}
+                    role={row.role}
+                    status={row.status}
+                    company={row.company}
+                    avatarUrl={row.avatarUrl}
+                    isVerified={row.verified}
+                    selected={selected.indexOf(row.user_id) !== -1}
+                    handleClick={(event) => handleClick(event, row.user_id)}
+                    user_id={row.user_id}
+                  />
+                ))}
                 <TableEmptyRows
                   height={5}
                   emptyRows={emptyRows(page, rowsPerPage, usersData.length)}
