@@ -16,18 +16,21 @@ import UserTableRow from "../user-table-row";
 import UserTableHead from "../user-table-head";
 import TableEmptyRows from "../table-empty-rows";
 import { emptyRows, applyFilter, getComparator } from "../utils.js";
-import { useUserContext } from "@/app/admin/api-data/user.data";
+import { fetchUsers } from "@/app/admin/api-data/user.data";
 import Link from "next/link";
+import { useQuery } from "react-query";
 import UserTableToolbar from "../user-table-toolbar";
 
 export default function UserPage() {
+  const { data: usersData, isLoading, isError } = useQuery("users", fetchUsers);
+
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
   const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState("name");
   const [filterName, setFilterName] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { usersData, isLoading, isError } = useUserContext();
+
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === "asc";
     if (id !== "") {
@@ -35,7 +38,7 @@ export default function UserPage() {
       setOrderBy(id);
     }
   };
-  console.log(usersData);
+
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelecteds = usersData.map((user) => user.user_id);
@@ -82,6 +85,7 @@ export default function UserPage() {
     comparator: getComparator(order, orderBy),
     filterName,
   });
+  console.log(dataFiltered);
   const data = dataFiltered[0].slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage

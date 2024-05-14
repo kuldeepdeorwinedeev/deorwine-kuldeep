@@ -1,56 +1,27 @@
-// UserProvider.js
 "use client";
-import React, { createContext, useContext, useEffect, useState } from "react";
 import { apiUrl } from "@/app/config";
 
-const UserContext = createContext();
+export const fetchUsers = async () => {
+  const token = window.localStorage.getItem("token");
+  const headers = {
+    token: token,
+    "Content-Type": "application/json",
+    accept: "application/json",
+  };
 
-export const useUserContext = () => useContext(UserContext);
+  const options = {
+    method: "GET",
+    headers: headers,
+  };
 
-export const UserProvider = ({ children }) => {
-  const [usersData, setUsersData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const response = await fetch(`${apiUrl}/admin/users`, options);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const fetchUsers = async () => {
-        try {
-          const token = window.localStorage.getItem("token");
-          const headers = {
-            token: token,
-            "Content-Type": "application/json",
-            accept: "application/json",
-          };
+  if (!response.ok) {
+    throw new Error("Failed to fetch data");
+  }
 
-          const options = {
-            method: "GET",
-            headers: headers,
-          };
+  // Await the resolution of the promise returned by response.json()
+  const data = await response.json();
 
-          const response = await fetch(`${apiUrl}/admin/users`, options);
-
-          if (!response.ok) {
-            throw new Error("Failed to fetch data");
-          }
-
-          const data = await response.json();
-          setUsersData(data.data);
-        } catch (error) {
-          console.error("Error fetching users:", error);
-          setIsError(true);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      fetchUsers();
-    }
-  }, []);
-
-  return (
-    <UserContext.Provider value={{ usersData, isLoading, isError }}>
-      {children}
-    </UserContext.Provider>
-  );
+  return data.data;
 };
