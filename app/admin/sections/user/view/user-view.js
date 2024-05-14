@@ -27,7 +27,7 @@ export default function UserPage() {
   const [orderBy, setOrderBy] = useState("name");
   const [filterName, setFilterName] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { usersData, isLoading, isError, fetchUsers } = useUserContext();
+  const { usersData, isLoading, isError } = useUserContext();
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === "asc";
     if (id !== "") {
@@ -35,12 +35,10 @@ export default function UserPage() {
       setOrderBy(id);
     }
   };
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = usersData.map((user) => user.username);
+      const newSelecteds = usersData.map((user) => user.user_id);
       setSelected(newSelecteds);
     } else {
       setSelected([]);
