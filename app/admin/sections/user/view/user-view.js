@@ -121,15 +121,17 @@ export default function UserPage() {
           onFilterName={handleFilterByName}
         />
         <Scrollbar>
-          <TablePagination
-            page={page}
-            component="div"
-            count={usersData.length}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
-            rowsPerPageOptions={[5, 10, 25]}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+          {usersData && (
+            <TablePagination
+              page={page}
+              component="div"
+              count={usersData.length}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+              rowsPerPageOptions={[5, 10, 25]}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          )}
           <TableContainer sx={{ overflow: "unset" }}>
             <Table sx={{ minWidth: 800 }}>
               <UserTableHead
