@@ -34,6 +34,7 @@ export const UserProvider = ({ children }) => {
       setUsersData(userdata);
       setIsLoading(false);
     } catch (error) {
+      console.log(error);
       setIsError(true);
       setIsLoading(false);
     }
