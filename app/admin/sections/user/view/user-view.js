@@ -18,11 +18,28 @@ import TableEmptyRows from "../table-empty-rows";
 import { emptyRows, applyFilter, getComparator } from "../utils.js";
 import { fetchUsers } from "@/app/admin/api-data/user.data";
 import Link from "next/link";
-import { useQuery } from "react-query";
+import { useQuery, QueryClient } from "react-query";
 import UserTableToolbar from "../user-table-toolbar";
 
 export default function UserPage() {
-  const { data: usersData, isLoading, isError } = useQuery("users", fetchUsers);
+  const queryClient = new QueryClient();
+  const {
+    data: usersData,
+    isLoading,
+    isError,
+  } = useQuery("users", fetchUsers, {
+    initialData: () => {
+      if (typeof window === "undefined") {
+        return fetchUsers();
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (usersData) {
+      queryClient.setQueryData("users", usersData);
+    }
+  }, [usersData, queryClient]);
 
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
