@@ -478,7 +478,7 @@ export function UserDetail({ onClick }) {
     setstatus(text);
     setOpen(false);
   };
-  const { usersData, isLoading, isError } = useUserContext();
+
   const {
     register,
     handleSubmit,
