@@ -15,6 +15,7 @@ export const UserProvider = ({ children }) => {
     try {
       if (typeof window !== "undefined") {
         const token = window.localStorage.getItem("token");
+        console.log(token);
         const headers = {
           token: `${token}`,
           "Content-Type": "application/json",
@@ -27,6 +28,7 @@ export const UserProvider = ({ children }) => {
         };
 
         const response = await fetch(`${apiUrl}/admin/users`, options);
+
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
