@@ -58,9 +58,12 @@ export default function UserTableRow({
     },
   });
 
-  const handleCloseMenu = async () => {
+  const handleUserDelete = async () => {
     await mutate(user_id);
     router.push("/admin/add-user");
+    setOpen(null);
+  };
+  const handleCloseMenu = async () => {
     setOpen(null);
   };
 
@@ -133,7 +136,11 @@ export default function UserTableRow({
         </Link>
 
         <MenuItem onClick={handleCloseMenu} sx={{ color: "error.main" }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
+          <Iconify
+            icon="eva:trash-2-outline"
+            sx={{ mr: 2 }}
+            onClick={handleUserDelete}
+          />
           Delete
         </MenuItem>
       </Popover>
