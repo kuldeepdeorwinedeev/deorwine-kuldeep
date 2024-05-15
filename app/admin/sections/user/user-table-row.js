@@ -10,11 +10,13 @@ import MenuItem from "@mui/material/MenuItem";
 import TableCell from "@mui/material/TableCell";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-
+import { useMutation } from "@tanstack/react-query";
 import Label from "../../components/label/label";
 import Iconify from "../../components/iconify/iconify";
 import Link from "next/link";
-
+import { deleteUsers } from "../../api-data/user.manage";
+import { Alert } from "@mui/material";
+import { useRouter } from "next/navigation";
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({
@@ -29,18 +31,57 @@ export default function UserTableRow({
   user_id,
 }) {
   const [open, setOpen] = useState(null);
-
+  const [alert, setAlert] = useState({ success: false, error: false });
+  const [message, setMessage] = useState("");
+  const router = useRouter();
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
+  const { mutate, isLoading } = useMutation({
+    mutationFn: deleteUsers,
 
-  const handleCloseMenu = () => {
+    onSuccess: (data) => {
+      console.log(data);
+      if (data.status === true) {
+        setAlert({ success: true, error: false });
+        setMessage(data.message);
+        setTimeout(() => {
+          router.push("/admin/user");
+        }, 1000);
+      } else {
+        setAlert({ success: false, error: true });
+        setMessage(data.message);
+      }
+    },
+    onError: (error) => {
+      // Error actions
+    },
+  });
+
+  const handleCloseMenu = async () => {
+    await mutate(user_id);
+    router.push("/admin/add-user");
     setOpen(null);
   };
-  console.log("user key", user_id);
 
+  const renderAlerts = () => {
+    if (alert.success) {
+      return (
+        <Alert severity="success" sx={{ height: 10 }}>
+          {message}
+        </Alert>
+      );
+    } else if (alert.error) {
+      return <Alert severity="error">{message}</Alert>;
+    }
+    return null;
+  };
+  {
+    renderAlerts();
+  }
   return (
     <>
+      {renderAlerts()}
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
         <TableCell padding="checkbox">
           <Checkbox disableRipple checked={selected} onChange={handleClick} />
