@@ -6,37 +6,16 @@ import { Button } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { addUsers } from "@/app/admin/api-data/add.user";
+import { addUsers } from "@/app/admin/api-data/user.manage";
 export default function addUser() {
   const [verified, setverified] = useState(false);
   const router = useRouter();
   const [alert, setAlert] = useState({ success: false, error: false });
   const [message, setMessage] = useState("");
   const handleFormVerify = (verify) => {
-    return setverified(!verify);
+    return setverified(!!verify);
   };
   console.log(verified);
-  const handleFormSubmit = async (data) => {
-    data.verified = verified;
-
-    const user = {
-      email: data.email,
-      password: data.password,
-      username: data.username,
-      role: data.role,
-      phoneNumber: data.phoneNumber,
-      state: data.state,
-      country: data.country,
-      zipCode: data.zipCode,
-      city: data.city,
-      address: data.address,
-      company: data.company,
-      status: data.status,
-      verified: data.verified,
-    };
-    console.log(user, "hello");
-    await mutate(user);
-  };
   const { mutate, isLoading } = useMutation({
     mutationFn: addUsers,
     onSuccess: (data) => {
@@ -56,6 +35,28 @@ export default function addUser() {
       // Error actions
     },
   });
+  const handleFormSubmit = async (data) => {
+    data.verified = verified;
+    console.log(data, "data data data");
+    const user = {
+      email: data.email,
+      password: data.password,
+      username: data.username,
+      role: data.role,
+      phoneNumber: data.phoneNumber,
+      state: data.state,
+      country: data.country,
+      zipCode: data.zipCode,
+      city: data.city,
+      address: data.address,
+      company: data.company,
+      status: data.status,
+      verified: data.verified,
+    };
+    console.log(user, "hello");
+    await mutate(user);
+  };
+
   // const onSubmit = async (data) => {
   //   const user = {
   //     email: data.email,
