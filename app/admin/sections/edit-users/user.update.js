@@ -453,10 +453,7 @@ const countries = [
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
   username: Yup.string().required("Username is required"),
-  password: Yup.string().min(
-    8,
-    "Password is too short - should be 8 chars minimum."
-  ),
+  password: Yup.string(),
   role: Yup.string().required("Role is required"),
   phoneNumber: Yup.string()
     .required("Phone number is required")
