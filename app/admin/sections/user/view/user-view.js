@@ -20,6 +20,7 @@ import { fetchUsers } from "@/app/admin/api-data/user.data";
 import Link from "next/link";
 import { useQuery, QueryClient } from "react-query";
 import UserTableToolbar from "../user-table-toolbar";
+import { Box, CircularProgress } from "@mui/material";
 
 export default function UserPage() {
   const queryClient = new QueryClient();
@@ -112,7 +113,6 @@ export default function UserPage() {
   console.log(data);
   const notFound = !dataFiltered[0].length && !!filterName;
 
-  if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching data</div>;
 
   return (
@@ -146,7 +146,7 @@ export default function UserPage() {
             <TablePagination
               page={page}
               component="div"
-              count={usersData.length}
+              count={usersData ? usersData.length : ""}
               rowsPerPage={rowsPerPage}
               onPageChange={handleChangePage}
               rowsPerPageOptions={[5, 10, 25]}
@@ -158,7 +158,7 @@ export default function UserPage() {
               <UserTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={usersData.length}
+                rowCount={usersData ? usersData.length : ""}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
@@ -171,33 +171,51 @@ export default function UserPage() {
                   { id: "" },
                 ]}
               />
-
-              <TableBody>
-                {Array.isArray(dataFiltered[0]) &&
-                dataFiltered[0].length > 0 ? (
-                  dataFiltered[0]
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      <UserTableRow
-                        key={row.user_id}
-                        name={row.username}
-                        role={row.role}
-                        status={row.status}
-                        company={row.company}
-                        avatarUrl={row.avatarUrl}
-                        isVerified={row.verified}
-                        selected={selected.indexOf(row.user_id) !== -1}
-                        handleClick={(event) => handleClick(event, row.user_id)}
-                        user_id={row.user_id}
-                      />
-                    ))
-                ) : (
-                  <>
-                    <TableEmptyRows height={5} />
-                    {notFound && <TableNoData query={filterName} />}
-                  </>
-                )}
-              </TableBody>
+              {isLoading ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    ml: 50,
+                    mt: 10,
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <TableBody>
+                  {Array.isArray(dataFiltered[0]) &&
+                  dataFiltered[0].length > 0 ? (
+                    dataFiltered[0]
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((row) => (
+                        <UserTableRow
+                          key={row.user_id}
+                          name={row.username}
+                          role={row.role}
+                          status={row.status}
+                          company={row.company}
+                          avatarUrl={row.avatarUrl}
+                          isVerified={row.verified}
+                          selected={selected.indexOf(row.user_id) !== -1}
+                          handleClick={(event) =>
+                            handleClick(event, row.user_id)
+                          }
+                          user_id={row.user_id}
+                        />
+                      ))
+                  ) : (
+                    <>
+                      <TableEmptyRows height={5} />
+                      {notFound && <TableNoData query={filterName} />}
+                    </>
+                  )}
+                </TableBody>
+              )}
             </Table>
           </TableContainer>
         </Scrollbar>

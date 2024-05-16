@@ -710,7 +710,7 @@ export function UserDetail({ onClick, usersData }) {
           }}
           type="submit"
         >
-          Add User
+          Update User
         </Button>
       </form>
     </Container>

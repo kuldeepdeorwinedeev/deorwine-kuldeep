@@ -1,5 +1,5 @@
 "use client";
-import { Alert, Container } from "@mui/material";
+import { Alert, Box, CircularProgress, Container } from "@mui/material";
 import ImageUpload from "../add-user/user-image";
 import { UserDetail } from "./user.update";
 import { Button } from "@mui/material";
@@ -12,40 +12,40 @@ import { upDateUsers } from "@/app/admin/api-data/user.manage";
 import { fetchUserDetails } from "../../api-data/user.data";
 export default function EditUser() {
   const queryClient = new QueryClient();
+
   const router = useRouter();
   const params = useParams();
   const user_id = params.user_id;
 
-  const { data: userDetail, isError } = useQuery(
-    ["users", user_id],
-    () => fetchUserDetails(user_id),
-    {
-      initialData: () => {
-        if (typeof window === "undefined") {
-          return fetchUserDetails(user_id);
-        }
-      },
-    }
-  );
+  const {
+    data: userDetail,
+    isError,
+    isLoading,
+  } = useQuery(["users", user_id], () => fetchUserDetails(user_id), {
+    initialData: () => {
+      if (typeof window === "undefined") {
+        return fetchUserDetails(user_id);
+      }
+    },
+  });
 
   useEffect(() => {
     if (userDetail) {
       queryClient.setQueryData(["users", user_id], userDetail);
     }
   }, [userDetail, user_id, queryClient]);
-  console.log(userDetail);
+
   const [verified, setverified] = useState(false);
   const [alert, setAlert] = useState({ success: false, error: false });
   const [message, setMessage] = useState("");
   const handleFormVerify = (verify) => {
     return setverified(!verify);
   };
-  console.log(verified);
-  const { mutate, isLoading } = useMutation({
+
+  const { mutate } = useMutation({
     mutationFn: upDateUsers,
 
     onSuccess: (data) => {
-      console.log(data);
       if (data.status === true) {
         setAlert({ success: true, error: false });
         setMessage(data.message);
@@ -79,31 +79,11 @@ export default function EditUser() {
       status: data.status,
       verified: data.verified,
     };
-    console.log(user, "hello");
-    console.log(user_id);
+
     if (user_id) {
       await mutate([user, user_id]);
     }
   };
-
-  // const onSubmit = async (data) => {
-  //   const user = {
-  //     email: data.email,
-  //     password: data.password,
-  //     username: data.username,
-  //     role: data.role,
-  //     phoneNumber: data.phoneNumber,
-  //     state: data.state,
-  //     country: data.country,
-  //     zipCode: data.zipCode,
-  //     city: data.city,
-  //     address: data.address,
-  //     company: data.company,
-  //     status: data.status,
-  //     verified: data.verified,
-  //   };
-  //   mutate(user);
-  // };
   const renderAlerts = () => {
     if (alert.success) {
       return <Alert severity="success">{message}</Alert>;
@@ -129,8 +109,24 @@ export default function EditUser() {
           flexDirection: "column",
         }}
       >
-        <ImageUpload onClick={handleFormVerify} />
-        <UserDetail onClick={handleFormSubmit} usersData={userDetail} />
+        {isLoading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              ml: 50,
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            <ImageUpload onClick={handleFormVerify} />
+
+            <UserDetail onClick={handleFormSubmit} usersData={userDetail} />
+          </>
+        )}
       </Container>
     </>
   );

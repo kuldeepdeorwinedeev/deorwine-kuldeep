@@ -26,9 +26,9 @@ export default function AppWebsiteVisits({
 
   useEffect(() => {
     const fetchData = async () => {
-      // const useChart = await DynamicUseChart();
+      // const useChart = ();
       const { labels, colors, series, options } = chart;
-      const option = DynamicUseChart({
+      const option = await DynamicUseChart({
         colors,
         plotOptions: {
           bar: {
